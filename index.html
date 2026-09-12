@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>내일 점심 도시락 선택</title>
+<style>
+:root{--bg:#f6f7f8;--card:#fff;--text:#171717;--muted:#717171;--line:#e8e8e8;--accent:#f59e0b;--accent2:#fff7e6;--danger:#dc2626;--ok:#0f766e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 44px}.hero{background:linear-gradient(135deg,#fff8e8,#fff);border:1px solid #f5e6bf;border-radius:22px;padding:22px 18px;margin-bottom:14px;box-shadow:0 5px 18px rgba(0,0,0,.04)}
+.eyebrow{font-size:13px;font-weight:800;color:#b45309;margin-bottom:6px}.hero h1{font-size:27px;line-height:1.25;margin:0 0 8px}.hero p{margin:4px 0;color:var(--muted);font-size:14px}.deadline{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid #f2dfb0;padding:12px 13px;border-radius:14px}.deadline strong{font-size:15px}.countdown{font-variant-numeric:tabular-nums;font-weight:800;color:#b45309}
+.namebox{position:sticky;top:0;z-index:10;padding:9px 0;background:linear-gradient(var(--bg) 75%,rgba(246,247,248,0))}.nameinner{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 4px 14px rgba(0,0,0,.05)}input{width:100%;border:0;outline:0;font-size:16px;padding:9px 10px;background:transparent}.namehint{font-size:12px;color:var(--muted);padding:2px 4px 10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card{border:1px solid var(--line);background:var(--card);border-radius:19px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.035);transition:.15s ease}.card:active{transform:scale(.985)}.card.selected{border:2px solid var(--accent);box-shadow:0 7px 24px rgba(245,158,11,.17)}
+.photo{height:150px;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(145deg,#faf7ef,#f1eee7);position:relative}.photo:after{content:"본도시락";position:absolute;left:10px;top:10px;font-size:11px;font-weight:800;color:#986a16;background:rgba(255,255,255,.82);padding:5px 7px;border-radius:99px}.body{padding:14px}.title{font-weight:850;font-size:16px;line-height:1.35;min-height:43px}.price{font-size:16px;font-weight:850;margin-top:5px}.desc{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.45;min-height:34px}.pick{margin-top:11px;width:100%;border:0;border-radius:12px;padding:11px 8px;font-size:14px;font-weight:850;background:#f2f2f2;color:#333}.selected .pick{background:var(--accent);color:white}.people{border-top:1px solid var(--line);padding:10px 14px 13px;min-height:55px}.people .count{font-size:12px;color:var(--muted);margin-bottom:6px}.chips{display:flex;gap:5px;flex-wrap:wrap}.chip{font-size:12px;font-weight:750;padding:5px 8px;border-radius:999px;background:#f3f4f6}.empty{font-size:12px;color:#aaa}
+.summary{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:19px;padding:17px}.summary h2{font-size:18px;margin:0 0 12px}.sumrow{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed #eee;font-size:14px}.sumrow:last-child{border:0}.sumrow b{white-space:nowrap}.total{margin-top:13px;padding-top:12px;border-top:2px solid #222;display:flex;justify-content:space-between;font-weight:900}.notice{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5;text-align:center}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1f2937;color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:750;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.show{opacity:1}.closed{background:#fff1f2!important;border-color:#fecdd3!important}.closed .countdown{color:var(--danger)}
+@media(max-width:560px){.wrap{padding:12px 10px 34px}.hero{padding:19px 15px}.hero h1{font-size:24px}.grid{gap:9px}.photo{height:128px;font-size:55px}.body{padding:12px}.title{font-size:14px;min-height:39px}.price{font-size:15px}.desc{font-size:11px;min-height:32px}.people{padding:9px 11px 12px}.chip{font-size:11px}.pick{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">🍱 본도시락 이수점</div>
+    <h1>내일 점심, 먹고 싶은 메뉴 골라주세요</h1>
+    <p>이름을 적고 메뉴 하나를 누르면 바로 등록됩니다.</p>
+    <p>다른 메뉴를 다시 누르면 기존 선택이 자동으로 바뀝니다.</p>
+    <div class="deadline" id="deadlineBox"><strong>⏰ 주문 마감 · 9월 13일 오전 10:30</strong><span class="countdown" id="countdown">계산 중</span></div>
+  </section>
+
+  <div class="namebox">
+    <div class="nameinner"><input id="name" maxlength="12" autocomplete="name" placeholder="이름 입력 (예: 김상훈)" /></div>
+    <div class="namehint">※ 같은 이름으로 다시 고르면 메뉴가 변경됩니다.</div>
+  </div>
+
+  <main class="grid" id="menuGrid"></main>
+  <section class="summary"><h2>📋 현재 주문 현황</h2><div id="summaryRows"></div><div class="total"><span>총 주문</span><span id="grandTotal">0개 · 0원</span></div></section>
+  <div class="notice">10:30 이후에는 자동 마감됩니다. 선택 현황은 주기적으로 새로고침됩니다.</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API_URL = 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE';
+const DEADLINE = new Date('2026-09-13T10:30:00+09:00');
+const menus = [
+ {id:'beef',name:'버섯소불고기 국반상',price:10900,icon:'🍱',desc:'버섯소불고기 · 국 · 튀김&전 · 한식반찬'},
+ {id:'squid',name:'오징어두루치기 국반상',price:10900,icon:'🌶️',desc:'오징어두루치기 · 국 · 튀김&전 · 한식반찬'},
+ {id:'pork',name:'깻잎제육 국반상',price:10500,icon:'🥩',desc:'깻잎제육볶음 · 국 · 계란후라이 · 튀김&전'},
+ {id:'bbqbeef',name:'바싹불고기 국반상',price:9900,icon:'🥢',desc:'바싹불고기 · 국 · 계란후라이 · 튀김&전'},
+ {id:'chicken',name:'숯불닭구이 국반상',price:9900,icon:'🍗',desc:'숯불 고추장닭구이 · 국 · 튀김&전 · 한식반찬'},
+ {id:'katsu',name:'본격도시락 (가츠&선)',price:8800,icon:'🍛',desc:'돈카츠 중심 본격도시락'}
+];
+let orders=[]; let myName=localStorage.getItem('lunch_name')||''; document.getElementById('name').value=myName;
+const money=n=>n.toLocaleString('ko-KR')+'원';
+function isConfigured(){return API_URL.startsWith('https://script.google.com/');}
+function isClosed(){return Date.now()>=DEADLINE.getTime();}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function render(){const grid=document.getElementById('menuGrid'); const selected=orders.find(o=>o.name===myName)?.menuId; grid.innerHTML='';
+ menus.forEach(m=>{const people=orders.filter(o=>o.menuId===m.id).map(o=>o.name); const el=document.createElement('article');el.className='card'+(selected===m.id?' selected':'');el.innerHTML=`<div class="photo">${m.icon}</div><div class="body"><div class="title">${m.name}</div><div class="price">${money(m.price)}</div><div class="desc">${m.desc}</div><button class="pick" ${isClosed()?'disabled':''}>${selected===m.id?'✓ 내가 선택한 메뉴':'이 메뉴 선택'}</button></div><div class="people"><div class="count">선택 ${people.length}명</div><div class="chips">${people.length?people.map(p=>`<span class="chip">${esc(p)}</span>`).join(''):'<span class="empty">아직 선택한 사람이 없어요</span>'}</div></div>`; el.querySelector('.pick').onclick=()=>pick(m); grid.appendChild(el)}); renderSummary(); }
+function renderSummary(){const box=document.getElementById('summaryRows');let total=0,amount=0;box.innerHTML=menus.map(m=>{const n=orders.filter(o=>o.menuId===m.id).length;total+=n;amount+=n*m.price;return `<div class="sumrow"><span>${m.name}</span><b>${n}개</b></div>`}).join('');document.getElementById('grandTotal').textContent=`${total}개 · ${money(amount)}`}
+function esc(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+async function pick(menu){const name=document.getElementById('name').value.trim();if(!name){toast('먼저 이름을 입력해주세요');document.getElementById('name').focus();return}if(isClosed()){toast('주문이 마감됐어요');return}myName=name;localStorage.setItem('lunch_name',name);
+ if(!isConfigured()){orders=orders.filter(o=>o.name!==name);orders.push({name,menuId:menu.id,menuName:menu.name,price:menu.price});localStorage.setItem('demo_orders',JSON.stringify(orders));render();toast(menu.name+' 선택 완료');return}
+ try{await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'pick',name,menuId:menu.id,menuName:menu.name,price:menu.price})});toast(menu.name+' 선택 완료');setTimeout(loadOrders,900)}catch(e){toast('등록 중 오류가 났어요')}
+}
+function loadOrders(){if(!isConfigured()){try{orders=JSON.parse(localStorage.getItem('demo_orders')||'[]')}catch(e){orders=[]}render();return}
+ const cb='lunchCb_'+Date.now();window[cb]=data=>{orders=Array.isArray(data.orders)?data.orders:[];render();delete window[cb];script.remove()};const script=document.createElement('script');script.src=API_URL+'?callback='+cb+'&t='+Date.now();script.onerror=()=>{script.remove();delete window[cb]};document.body.appendChild(script)}
+function tick(){const d=DEADLINE-Date.now(),box=document.getElementById('deadlineBox'),el=document.getElementById('countdown');if(d<=0){el.textContent='마감';box.classList.add('closed');render();return}const h=Math.floor(d/3600000),m=Math.floor((d%3600000)/60000),s=Math.floor((d%60000)/1000);el.textContent=h>24?Math.floor(h/24)+'일 '+(h%24)+'시간':`${h}시간 ${m}분 ${s}초`}
+loadOrders();tick();setInterval(tick,1000);setInterval(loadOrders,15000);document.getElementById('name').addEventListener('change',e=>{myName=e.target.value.trim();localStorage.setItem('lunch_name',myName);render()});
+</script>
+</body>
+</html>
